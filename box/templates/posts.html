@@ -4,16 +4,28 @@
 <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-        <form action="" method="POST" enctype="multipart/form-data">
-             {% csrf_token %}
-        <h3>Make your posts and Information</h3>
-        {{ form.as_p}}
-        </form>
+        <h3>POSTS</h3>
+        {% for post in data %}
+        <div class="posts">
+            <div class="post">
+                <img src="{{ post.image.url }}" alt="Post Image">
+                <p>Posted by: {{ box.user.username}}</p>
+                <p>Posted on: {{ box.details }}</p>
+            </div>
+        <a href="{% url 'update' %}" class="btn btn-success" type="button">UPDATE</a>
+     <a href="{% url 'delete' %}" class="btn btn-danger" type="button" onclick="return confirm('Are you sure you want delete this customer?')">DELETE</a>
+            <form method="POST" action="{% url 'comment' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="comment">Add Comment:</label>
+        <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Comment</button>
+</form>
 
+        {% endfor %}
+         </div>
     </div>
     <div class="col-md-3"></div>
-
 </div>
-
-
 {% endblock %}

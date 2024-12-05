@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>UPDATE POST</h3>
+{% if messages %}
+    {% for message in message %}
+        <div class="alert{{message.tags }}">{{ message}}</div>
+    {% endfor %}
+{% endif %}
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+       {{ form.as_p}}
+    <button type="submit" class="btn btn-success">UPDATE</button>
+    <a href="{%url 'post' box.id %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

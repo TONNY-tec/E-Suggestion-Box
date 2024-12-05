@@ -1,31 +1,43 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 import box
-from box.models import Box
+from .models import Box, Comment
 
 
 class BoxForms(forms.ModelForm):
+    # image = forms.ImageField()
+    # details = forms.CharField(widget=forms.Textarea, required=False)
     class Meta:
         model = Box
-        fields = '__all__'
+        fields = [
+            'image',
+            'details'
+        ]
+
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*', 'title': 'upload image'}),
             'details': forms.TextInput(attrs={'class': 'form-control', 'accept': 'text/plain'}),
         }
-
-class LoginForm(AuthenticationForm):
+class CommentForm(forms.ModelForm):
     class Meta:
-        model = Box
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter your email'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}))
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Add your comment here'}),
+        }
 
-class RegisterForm(AuthenticationForm):
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(label="",
+                             widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email Address'}))
+    first_name = forms.CharField(label="", max_length=100,
+                                 widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(label="", max_length=100,
+                                widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
+
     class Meta:
-        model = Box
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter your email'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}))
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}))
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
-    def save(self):
-        pass
