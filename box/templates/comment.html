@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Comments for "{{ post.title }}"</h2>
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment.user.username }}: {{ comment.detail }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% endblock %}

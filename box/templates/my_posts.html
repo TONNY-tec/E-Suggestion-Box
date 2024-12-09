@@ -1,18 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="distance">
 <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
-        <h3>POSTS</h3>
+        <h3>MY POSTS</h3>
         {% for post in data %}
             <div class="post">
                 <img src="{{ post.image.url }}" alt="Post Image">
-                <p>Posted by: {{ box.user}}</p>
-                <p>Posted on: {{ box.details }}</p>
+                <p>Posted by: {{ post.user.username}}</p>
+                <p>Post Description: {{ post.details }}</p>
+               <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        See Comments
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for comment in post.comments.all %}
+                            <a class="dropdown-item" href="{% url 'comment_details' post.id %}">{{ post.comment.user.username }}: {{ post.comment.text }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>
     <div class="col-md-3"></div>
+</div>
 </div>
 {% endblock %}

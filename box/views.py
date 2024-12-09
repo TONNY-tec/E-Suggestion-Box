@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import context
 
 import box
-from box.forms import BoxForms , RegisterForm
+from box.forms import BoxForms, RegisterForm, CommentForm
 from box.models import Box, Comment
 
 
@@ -25,9 +25,11 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
+# def
 def logout_view(request):
     logout(request)
     return redirect('login')
+
 @login_required
 def create_posts(request):
     if request.method == 'POST':
@@ -43,7 +45,8 @@ def create_posts(request):
 
 def posts(request):
     data = Box.objects.all()
-    context = {'data':data}
+    form = CommentForm()
+    context = {'data':data, 'form':form}
     return render(request, 'posts.html', context)
 
 @login_required
@@ -52,6 +55,23 @@ def my_posts(request):
     context = {'data': data}
     return render(request, 'my_posts.html', context)
 
+
+class Post:
+    pass
+
+
+@login_required
+def comment_details(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.all() 
+    return render(request, 'comment_details.html', {'post': post, 'comments': comments})
+# def comment_details(request, id):
+#     comment = Box.objects.filter(user=request.user, id=id)
+#     form = CommentForm()
+#     # comments = Comment.objects.filter(post__in=data)
+#     context = {'comment': comment, 'form': form}
+#     return render(request, 'my_posts.html', context)
+
 @login_required
 def update(request, id):
     box = get_object_or_404(Box, id=id)
@@ -59,7 +79,6 @@ def update(request, id):
         form = BoxForms(request.POST, request.FILES, instance=box)
         if form.is_valid():
             form.save()
-
             if 'image' in request.FILES:
                 file_name = os.path.basename(request.FILES['image'].name)
                 messages.success(request,'Post updated successfully! {file_name}uploaded')
@@ -70,44 +89,47 @@ def update(request, id):
             messages.error(request,'Please confirm your changes')
     else:
         form = BoxForms(instance=box)
-    return render(request, 'update.html',{'form': form, 'box': box} )
+    return render(request, 'update.html',{'form': form})
 
 @login_required
-def comment(request):
+def comment(request, id):
+    post = get_object_or_404(Box, id=id)
     if request.method == 'POST':
-        comment_text = request.POST.get('comment')
-        if comment_text:  # Check if comment is not empty
-            post_id = request.POST.get('post_id')  # Get the post ID from the form
-            post = get_object_or_404(Box, id=id)
-            comment = Comment.objects.create(comment=comment_text, user=request.user, post=post)
-            comment.save()
-            return redirect('my_posts')  # Redirect to user's posts after adding comment
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            body= form.save(commit=False)
+            body.user = request.user
+            body.post = post
+            body.save()
+            return redirect('my_posts')
     else:
-        return redirect('my_posts')  # Redirect if not a POST request
+        form = CommentForm()
+    return render(request, 'my_post.html', {'form': form, 'post': post})
 
-# def update(request, id):
-#     box = get_object_or_404(Box, id=id)
-#
-#     if request.method == 'POST':
-#         form = BoxForms(request.POST, request.FILES, instance=box)  # Pre-populate the form with existing data
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, f'Your post "{box.title}" has been updated!')
-#             return redirect('my_posts')  # Redirect to user's posts after update
-#     else:
-#         form = BoxForms(instance=box)  # Create form with existing post data for editing
-#
-#     context = {'form': form, 'post': box}
-#     return render(request, 'update.html', context)
+# @login_required
+# def comment_view(request)
 
+    # @login_required
+    # def create_posts(request):
+    #     if request.method == 'POST':
+    #         form = BoxForms(request.POST, request.FILES)
+    #         if form.is_valid():
+    #             box = form.save(commit=False)
+    #             box.user = request.user
+    #             box.save()
+    #             return redirect('create_posts')
+    #     else:
+    #         form = BoxForms()
+    #     return render(request, 'create_posts.html', {'form': form})
+@login_required
 def delete(request, id):
-    customer = get_object_or_404(Box, id=id)
+    post = get_object_or_404(Box, id=id)
     try:
-        customer.delete()
-        messages.success(request,'Customer deleted successfully!')
+        post.delete()
+        messages.success(request,'Post deleted successfully!')
     except Exception as e:
-        messages.error(request,'Error deleting customer')
-    return redirect('about')
+        messages.error(request,'Error deleting post')
+    return redirect('posts')
 
 # def post_detail(request, post_id):
 #     post = get_object_or_404(Box, pk=post_id)

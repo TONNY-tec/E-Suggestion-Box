@@ -1,31 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="distance">
 <div class="row">
     <div class="col-md-3"></div>
     <div class="col-md-6">
         <h3>POSTS</h3>
         {% for post in data %}
-        <div class="posts">
-            <div class="post">
-                <img src="{{ post.image.url }}" alt="Post Image">
-                <p>Posted by: {{ box.user.username}}</p>
-                <p>Posted on: {{ box.details }}</p>
-            </div>
-        <a href="{% url 'update' %}" class="btn btn-success" type="button">UPDATE</a>
-     <a href="{% url 'delete' %}" class="btn btn-danger" type="button" onclick="return confirm('Are you sure you want delete this customer?')">DELETE</a>
-            <form method="POST" action="{% url 'comment' %}">
+             <div class="card">
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="Post Image">
+                        <div class="card-body">
+                            <p>Posted by: {{ post.user.username }}</p>
+                            <p>Post Description: {{ post.details }}</p>
+                        </div>
+                    </div>
+        <a href="{% url 'update' post.id %}" class="btn btn-success" type="button">UPDATE</a>
+     <a href="{% url 'delete' post.id %}" class="btn btn-danger" type="button" onclick="return confirm('Are you sure you want delete this post?')">DELETE</a>
+            <form method="POST" action="{% url 'comment' post.id %}">
     {% csrf_token %}
     <div class="form-group">
-        <label for="comment">Add Comment:</label>
-        <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+        <label for="comment">Make your comment and suggestions here:</label>
+        {{ form.as_p }}
     </div>
     <button type="submit" class="btn btn-primary">Submit Comment</button>
 </form>
 
         {% endfor %}
          </div>
-    </div>
     <div class="col-md-3"></div>
+</div>
 </div>
 {% endblock %}
